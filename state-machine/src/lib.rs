@@ -23,7 +23,7 @@ mod tests {
     use super::*;
 
     struct Counter {
-        ctr: u64
+        ctr: u64,
     }
 
     enum CtrOp {
@@ -32,7 +32,7 @@ mod tests {
     }
 
     enum CtrReadOnlyOp {
-        Get
+        Get,
     }
 
     impl StateMachine for Counter {
@@ -50,7 +50,7 @@ mod tests {
 
         fn execute_ro(&self, op: CtrReadOnlyOp) -> Self::Result {
             Ok(match op {
-                CtrReadOnlyOp::Get => self.ctr
+                CtrReadOnlyOp::Get => self.ctr,
             })
         }
     }

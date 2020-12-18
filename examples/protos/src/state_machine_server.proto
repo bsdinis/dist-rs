@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package state_machine_server;
+
+message IncrCounterReq {
+    uint64 step = 1;
+}
+message IncrCounterResp {
+    uint64 cur = 1;
+}
+
+message DecrCounterReq {
+    uint64 step = 1;
+}
+message DecrCounterResp {
+    uint64 cur = 1;
+}
+
+message AtomicIncrCounterReq {
+    uint64 before = 1;
+    uint64 step = 2;
+}
+message AtomicIncrCounterResp {
+    uint64 cur = 1;
+    bool success = 2;
+}
+
+message AtomicDecrCounterReq {
+    uint64 before = 1;
+    uint64 step = 2;
+}
+message AtomicDecrCounterResp {
+    uint64 cur = 1;
+    bool success = 2;
+}
+
+message GetCounterReq {}
+message GetCounterResp {
+    uint64 cur = 1;
+}
+
+
+service ClientApi {
+	rpc incr(IncrCounterReq) returns (IncrCounterResp);
+	rpc decr(DecrCounterReq) returns (DecrCounterResp);
+	rpc atomic_incr(AtomicIncrCounterReq) returns (AtomicIncrCounterResp);
+	rpc atomic_decr(AtomicDecrCounterReq) returns (AtomicDecrCounterResp);
+	rpc get(GetCounterReq) returns (GetCounterResp);
+}
