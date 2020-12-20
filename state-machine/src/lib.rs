@@ -1,5 +1,4 @@
 #![no_std]
-#![cfg_attr(not(test), no_std)]
 
 /// Very basic State Machine Abstraction
 ///
