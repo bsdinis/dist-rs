@@ -4,11 +4,11 @@ use std::net::ToSocketAddrs;
 use argh::FromArgs;
 use eyre::Result;
 
-use protos::client_api_server::ClientApiServer;
+use kvs_protocol::key_value_store_server::KeyValueStoreServer;
 use tonic::transport::Server;
 
 mod service;
-use service::ClientApiService;
+use service::MapStore;
 
 use tracing::{event, Level};
 
@@ -18,10 +18,6 @@ struct Options {
     /// bind addr
     #[argh(positional)]
     addr: String,
-
-    /// counter initial value
-    #[argh(positional)]
-    ctr_initial: u64,
 }
 
 #[tokio::main]
@@ -41,9 +37,7 @@ async fn main() -> Result<()> {
         .expect("Unable to set global default subscriber");
 
     let server = Server::builder()
-        .add_service(ClientApiServer::new(ClientApiService::new(
-            options.ctr_initial,
-        )))
+        .add_service(KeyValueStoreServer::new(MapStore::new()))
         .serve_with_shutdown(addr, ctrl_c());
 
     event!(Level::INFO, "Sever listening on {:?}", addr);

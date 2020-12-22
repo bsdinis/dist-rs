@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package kvs;
+
+message Ts {
+    uint64 ts = 1;
+    uint64 cid = 2;
+}
+message Val {
+    bytes val = 1;
+}
+
+message GetReq {
+    uint64 key = 1;
+}
+message GetResp {
+    Val val = 1;
+    Ts ts = 2;
+}
+
+message PutReq {
+    uint64 key = 1;
+    Val val = 2;
+    Ts ts = 3;
+}
+
+message PutResp { }
+
+service KeyValueStore {
+	rpc get(GetReq) returns (GetResp);
+	rpc put(PutReq) returns (PutResp);
+}

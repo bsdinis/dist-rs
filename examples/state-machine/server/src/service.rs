@@ -1,5 +1,5 @@
-use protos::client_api_server::ClientApi;
-use protos::*;
+use counter_protocol::counter_server::Counter as ProtoCounter;
+use counter_protocol::*;
 use tonic::{Request, Response, Status};
 
 use std::sync::RwLock;
@@ -103,13 +103,13 @@ impl StateMachine for Counter {
     }
 }
 
-pub struct ClientApiService {
+pub struct CounterService {
     ctr: RwLock<Counter>,
 }
 
-impl ClientApiService {
+impl CounterService {
     pub fn new(init: u64) -> Self {
-        ClientApiService {
+        CounterService {
             ctr: RwLock::new(Counter { ctr: init }),
         }
     }
@@ -150,7 +150,7 @@ impl ClientApiService {
 }
 
 #[tonic::async_trait]
-impl ClientApi for ClientApiService {
+impl ProtoCounter for CounterService {
     async fn get(
         &self,
         _request: Request<GetCounterReq>,

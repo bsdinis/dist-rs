@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package state_machine_server;
+package counter;
 
 message IncrCounterReq {
     uint64 step = 1;
@@ -40,7 +40,7 @@ message GetCounterResp {
 }
 
 
-service ClientApi {
+service Counter {
 	rpc incr(IncrCounterReq) returns (IncrCounterResp);
 	rpc decr(DecrCounterReq) returns (DecrCounterResp);
 	rpc atomic_incr(AtomicIncrCounterReq) returns (AtomicIncrCounterResp);

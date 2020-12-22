@@ -1,5 +1,5 @@
 [package]
-name = "protos"
+name = "kvs-protocol"
 version = "0.1.0"
 authors = [
 	"bsdinis <baltasar.dinis@tecnico.ulisboa.com>",

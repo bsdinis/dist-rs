@@ -1,5 +1,5 @@
 [package]
-name = "clnt-state-machine"
+name = "kvs-server"
 version = "0.1.0"
 authors = ["bsdinis <baltasar.dinis@tecnico.ulisboa.com>"]
 edition = "2018"
@@ -9,8 +9,14 @@ edition = "2018"
 [dependencies]
 argh = "0.1"
 color-eyre = "0.5"
+dashmap = "3.11"
 eyre = "0.6"
-protos = { path = "../protos" }
 tokio = { version = "0.2", features = ["full"] }
 tonic = "0.3.1"
-structopt = "0.3"
+tracing = "0.1"
+tracing-appender = "0.1"
+tracing-futures = "0.2"
+tracing-subscriber = "0.2"
+
+kvs-protocol = { path = "../protocol" }
+abd = { path = "../../../abd" }
