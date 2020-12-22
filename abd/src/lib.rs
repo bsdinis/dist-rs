@@ -1,3 +1,5 @@
+/// ABD protocol implementation
+
 pub mod store;
 use async_trait::async_trait;
 use futures::future::join_all;
@@ -5,6 +7,11 @@ use futures::select;
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::sync::Mutex;
 
+/// Protocol errors
+///
+/// This error is generic over the connection error
+/// This allows that when a quorum is unavailable *because* there were failures in the connection,
+/// that that information is piped to the client
 #[derive(Debug)]
 pub enum Error<ConnError: std::error::Error> {
     UnavailableQuorum {
@@ -43,6 +50,9 @@ where
     }
 }
 
+/// Model of the connection
+///
+/// This behaves as a shim remote storage
 #[async_trait]
 pub trait Conn {
     type Key: Clone;
@@ -51,6 +61,7 @@ pub trait Conn {
     type ClientId: Clone + Ord + store::Min + Eq;
     type Error: std::error::Error;
 
+    /// write an element to the remote storage
     async fn write(
         &mut self,
         k: &Self::Key,
@@ -58,15 +69,22 @@ pub trait Conn {
         ts: Self::Ts,
         cid: Self::ClientId,
     ) -> Result<(), Self::Error>;
+
+    /// read an element from the remote storage
     async fn read(
         &mut self,
         k: &Self::Key,
     ) -> Result<Option<store::Timestamped<Self::Item, Self::Ts, Self::ClientId>>, Self::Error>;
+
+    /// whether a node is reachable or not
     fn is_connected(&self) -> bool {
         true
     }
 }
 
+/// The type which implements the protocol
+///
+/// It simply holds the connections and the fault tolerance parameter
 pub struct Client<C: Conn> {
     conns: Vec<Mutex<C>>,
     f: usize,
@@ -76,6 +94,7 @@ impl<C> Client<C>
 where
     C: Conn,
 {
+    /// Create a new client.
     pub fn new(conns: Vec<C>, f: usize) -> Self {
         Client {
             conns: conns.into_iter().map(|c| Mutex::new(c)).collect(),
@@ -83,16 +102,22 @@ where
         }
     }
 
+    /// Number of replicas in the replication set
     pub fn n(&self) -> usize {
         2 * self.f + 1
     }
+
+    /// Size of a write quorum
     pub fn write_quorum(&self) -> usize {
         self.f + 1
     }
+
+    /// Size of a read quorum
     pub fn read_quorum(&self) -> usize {
         self.f + 1
     }
 
+    /// Number of unavailable nodes
     fn available_nodes(&self) -> usize {
         self.conns
             .iter()
@@ -100,21 +125,30 @@ where
             .count()
     }
 
+    /// Instanciate a guard over the connections
+    ///
+    /// When operating over the connections, it is important that the guards to their inner
+    /// elements remain binded to a variable. This utility method provides a shorthand for creating
+    /// guards to all connections.
     fn guard(&self) -> Vec<std::sync::MutexGuard<'_, C>> {
         let guards: Vec<_> = self.conns.iter().map(|x| x.lock().unwrap()).collect();
         guards
     }
 
+    /// Whether the client is fully available
     pub fn is_available(&self) -> bool {
         self.is_write_available() && self.is_read_available()
     }
+    /// Whether the client is available for writes
     pub fn is_write_available(&self) -> bool {
         self.available_nodes() >= self.write_quorum()
     }
+    /// Whether the client is available for reads
     pub fn is_read_available(&self) -> bool {
         self.available_nodes() >= self.read_quorum()
     }
 
+    /// Perform write to a distributed register
     pub async fn write<F>(
         &self,
         k: &C::Key,
@@ -222,6 +256,7 @@ where
         }
     }
 
+    /// Perform read from a distributed register
     pub async fn read(&self, k: &C::Key) -> Result<Option<C::Item>, Error<C::Error>> {
         if !self.is_read_available() {
             return Err(Error::UnavailableQuorum {

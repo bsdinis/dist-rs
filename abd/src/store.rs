@@ -1,6 +1,8 @@
-/// ABD standard implementation
+/// Storage requirements for ABD
 
 /// Produce the minimum value of a type
+///
+/// This trait makes it possible for the protocol to generate the first timestamp of an object
 pub trait Min {
     fn min() -> Self;
 }
@@ -37,14 +39,17 @@ where
     }
 }
 
-/// Trait defining which type of elements are stored
-/// and `how` they are stored
+/// Trait defining which type of elements are stored and `how` they are stored
 ///
 /// Here would be the place to implement persistency
 ///
 /// The protocol will then be programmed against this local store
 ///
-/// The trait should be accessible from multiple threads
+/// The object should be accessible from multiple threads
+///
+/// If the protocol should support deletions, that should be modelled by making `Item` be an
+/// `Option<T>`. This way, deleting, is just writing None. It does make using the API _slightly_
+/// cumbersome because the return type or `read`s becomes `Option<Timestamped<Option<_>, _, _>>`.
 pub trait LocalStorage {
     type Key;
     type Item;
@@ -52,6 +57,7 @@ pub trait LocalStorage {
     type ClientId: Ord + Min;
     type Error;
 
+    /// write a value to the local storage
     fn write(
         &self,
         k: &Self::Key,
@@ -59,6 +65,8 @@ pub trait LocalStorage {
         timestamp: Self::Ts,
         client_id: Self::ClientId,
     ) -> Result<(), Self::Error>;
+
+    /// read a value from the local storage
     fn read(
         &self,
         k: &Self::Key,
