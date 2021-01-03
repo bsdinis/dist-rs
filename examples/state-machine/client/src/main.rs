@@ -1,4 +1,4 @@
-use counter_protocol::counter_client::CounterClient;
+use state_machine_protocol::counter_client::CounterClient;
 use eyre::Result;
 use structopt::StructOpt;
 use tonic::transport::{Channel, Uri};
@@ -43,7 +43,7 @@ async fn main() -> Result<()> {
 async fn do_get(mut rem: CounterClient<Channel>) -> Result<()> {
     println!("executing get()");
     let res = rem
-        .get(counter_protocol::GetCounterReq {})
+        .get(state_machine_protocol::GetCounterReq {})
         .await?
         .get_ref()
         .cur;
@@ -54,7 +54,7 @@ async fn do_get(mut rem: CounterClient<Channel>) -> Result<()> {
 async fn do_incr(mut rem: CounterClient<Channel>, step: u64) -> Result<()> {
     println!("executing incr({})", step);
     let res = rem
-        .incr(counter_protocol::IncrCounterReq { step })
+        .incr(state_machine_protocol::IncrCounterReq { step })
         .await?
         .get_ref()
         .cur;
@@ -65,7 +65,7 @@ async fn do_incr(mut rem: CounterClient<Channel>, step: u64) -> Result<()> {
 async fn do_decr(mut rem: CounterClient<Channel>, step: u64) -> Result<()> {
     println!("executing decr({})", step);
     let res = rem
-        .decr(counter_protocol::DecrCounterReq { step })
+        .decr(state_machine_protocol::DecrCounterReq { step })
         .await?
         .get_ref()
         .cur;
@@ -79,14 +79,14 @@ async fn do_atomic_incr(mut rem: CounterClient<Channel>, before: u64, step: u64)
         before, step
     );
     match rem
-        .atomic_incr(counter_protocol::AtomicIncrCounterReq { before, step })
+        .atomic_incr(state_machine_protocol::AtomicIncrCounterReq { before, step })
         .await?
         .get_ref()
     {
-        counter_protocol::AtomicIncrCounterResp { cur, success: true } => {
+        state_machine_protocol::AtomicIncrCounterResp { cur, success: true } => {
             println!("counter value = {} [incremented successfully]", cur)
         }
-        counter_protocol::AtomicIncrCounterResp {
+        state_machine_protocol::AtomicIncrCounterResp {
             cur,
             success: false,
         } => println!("counter value = {} [failed to increment]", cur),
@@ -100,14 +100,14 @@ async fn do_atomic_decr(mut rem: CounterClient<Channel>, before: u64, step: u64)
         before, step
     );
     match rem
-        .atomic_decr(counter_protocol::AtomicDecrCounterReq { before, step })
+        .atomic_decr(state_machine_protocol::AtomicDecrCounterReq { before, step })
         .await?
         .get_ref()
     {
-        counter_protocol::AtomicDecrCounterResp { cur, success: true } => {
+        state_machine_protocol::AtomicDecrCounterResp { cur, success: true } => {
             println!("counter value = {} [decremented successfully]", cur)
         }
-        counter_protocol::AtomicDecrCounterResp {
+        state_machine_protocol::AtomicDecrCounterResp {
             cur,
             success: false,
         } => println!("counter value = {} [failed to decrement]", cur),

@@ -1,5 +1,5 @@
 [package]
-name = "counter-protocol"
+name = "state-machine-protocol"
 version = "0.1.0"
 authors = [
 	"bsdinis <baltasar.dinis@tecnico.ulisboa.com>",

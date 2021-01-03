@@ -1,5 +1,5 @@
 [package]
-name = "state-machine-client"
+name = "raft"
 version = "0.1.0"
 authors = ["bsdinis <baltasar.dinis@tecnico.ulisboa.com>"]
 edition = "2018"
@@ -7,11 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-argh = "0.1"
-color-eyre = "0.5"
-eyre = "0.6"
-tokio = { version = "0.2", features = ["full"] }
-tonic = "0.3.1"
-structopt = "0.3"
+async-trait = "0.1.42"
+dashmap = "4.0"
+tokio = { version = "1.0" , features = ["sync", "macros"] }
+futures = "0.3"
 
-state-machine-protocol = { path = "../protocol" }
+[dev-dependencies]
+tokio-test="0.4"
