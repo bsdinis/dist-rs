@@ -3,42 +3,60 @@ syntax = "proto3";
 package counter;
 
 message IncrCounterReq {
-    uint64 step = 1;
+    int64 step = 1;
 }
 message IncrCounterResp {
-    uint64 cur = 1;
+    int64 cur = 1;
 }
 
 message DecrCounterReq {
-    uint64 step = 1;
+    int64 step = 1;
 }
 message DecrCounterResp {
-    uint64 cur = 1;
+    int64 cur = 1;
 }
 
 message AtomicIncrCounterReq {
-    uint64 before = 1;
-    uint64 step = 2;
+    int64 before = 1;
+    int64 step = 2;
 }
 message AtomicIncrCounterResp {
-    uint64 cur = 1;
+    int64 cur = 1;
     bool success = 2;
 }
 
 message AtomicDecrCounterReq {
-    uint64 before = 1;
-    uint64 step = 2;
+    int64 before = 1;
+    int64 step = 2;
 }
 message AtomicDecrCounterResp {
-    uint64 cur = 1;
+    int64 cur = 1;
     bool success = 2;
 }
 
 message GetCounterReq {}
 message GetCounterResp {
-    uint64 cur = 1;
+    int64 cur = 1;
 }
 
+message StatusReq {}
+
+message Optional {
+    uint64 val = 1;
+}
+message StatusResp {
+    uint64 id = 1;
+    uint64 available = 2;
+    uint64 quorum_sz = 3;
+    uint64 term = 4;
+    Optional leader = 5;
+    Optional voted_for = 6;
+    uint64 last_term = 7;
+    uint64 last_idx = 8;
+    uint64 committed_idx = 9;
+    uint64 entries = 10;
+    uint64 unstable = 11;
+}
 
 service Counter {
 	rpc incr(IncrCounterReq) returns (IncrCounterResp);
@@ -46,4 +64,6 @@ service Counter {
 	rpc atomic_incr(AtomicIncrCounterReq) returns (AtomicIncrCounterResp);
 	rpc atomic_decr(AtomicDecrCounterReq) returns (AtomicDecrCounterResp);
 	rpc get(GetCounterReq) returns (GetCounterResp);
+
+    rpc status(StatusReq) returns (StatusResp);
 }
