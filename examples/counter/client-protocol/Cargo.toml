@@ -2,7 +2,7 @@
 name = "counter-client-protocol"
 version = "0.1.0"
 authors = [
-	"bsdinis <baltasar.dinis@tecnico.ulisboa.com>",
+	"bsdinis <baltasar.dinis@tecnico.ulisboa.pt>",
 ]
 edition = "2018"
 
