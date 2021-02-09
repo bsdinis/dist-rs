@@ -1,6 +1,6 @@
-# repl-rs
+# dist-rs
 
-Generic replication protocol implementation, written in Rust.
+Generic distributed replication protocol implementations, written in Rust.
 
 ## Motivation
 
